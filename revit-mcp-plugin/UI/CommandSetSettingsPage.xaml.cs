@@ -121,14 +121,14 @@ namespace revit_mcp_plugin.UI
                                 // 如果至少有一个版本支持此命令
                                 if (supportedCommandVersions.Count > 0 && dllBasePath != null)
                                 {
-                                    // 创建命令配置
+                                    // 创建命令配置 - 默认启用命令
                                     var commandConfig = new CommandConfig
                                     {
                                         CommandName = command.CommandName,
                                         Description = command.Description,
                                         // 使用带有版本占位符的路径
                                         AssemblyPath = dllBasePath,
-                                        Enabled = false,
+                                        Enabled = true, // 默认启用所有找到的命令
                                         // 记录所有支持的版本
                                         SupportedRevitVersions = supportedCommandVersions.ToArray()
                                     };
