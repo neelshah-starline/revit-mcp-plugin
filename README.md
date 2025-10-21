@@ -73,7 +73,7 @@ This plugin works in conjunction with:
        <FullClassName>revit_mcp_plugin.Core.Application</FullClassName>
        <ClientId>090A4C8C-61DC-426D-87DF-E4BAE0F80EC1</ClientId>
        <VendorId>revit-mcp</VendorId>
-       <VendorDescription>https://github.com/neelshah-starline/revit-mcp-plugin</VendorDescription>
+       <VendorDescription></VendorDescription>
      </AddIn>
    </RevitAddIns>
    ```
