@@ -1,131 +1,279 @@
-# revit-mcp-plugin
+# 🔗 Revit MCP Plugin
 
-English | [简体中文](README_zh.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Revit 2019-2024](https://img.shields.io/badge/Revit-2019--2024-blue.svg)](https://www.autodesk.com/products/revit/overview)
+[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)](https://www.microsoft.com/windows)
 
-## Introduction
+> A powerful Revit plugin that enables AI assistants to interact with Autodesk Revit through the Model Context Protocol (MCP)
 
-revit-mcp-plugin is a Revit plugin based on the MCP protocol, enabling AI to interact with Revit.
+## 📋 Table of Contents
 
-This project is part of the revit-mcp project (receives messages, loads command sets, operates Revit), and needs to be used in conjunction with [revit-mcp](https://github.com/revit-mcp/revit-mcp) (provides tools to AI) and [revit-mcp-commandset](https://github.com/revit-mcp/revit-mcp-commandset) (specific feature implementations).
+- [✨ Features](#-features)
+- [📋 Prerequisites](#-prerequisites)
+- [🚀 Installation](#-installation)
+- [⚙️ Configuration](#️-configuration)
+- [🎯 Usage](#-usage)
+- [🔧 Custom Commands](#-custom-commands)
+- [🏗️ Project Structure](#️-project-structure)
+- [🐛 Troubleshooting](#-troubleshooting)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
-## Environment Requirements
+## ✨ Features
 
-- Revit 2019~2024
+- **🤖 AI Integration**: Seamless integration with AI assistants via MCP protocol
+- **⚡ Command Management**: Dynamic loading and management of Revit command sets
+- **🔌 Socket Communication**: Real-time communication with external MCP services
+- **🎛️ Settings Interface**: User-friendly configuration through Revit add-in interface
+- **📦 Version Compatibility**: Support for Revit 2019-2024
+- **🔧 Extensible Architecture**: Easy development of custom commands
 
-## Usage Instructions
+## 📋 Prerequisites
 
-### Register Plugin
+### System Requirements
+- **Operating System**: Windows 10/11 (64-bit)
+- **Revit Version**: 2019, 2020, 2021, 2022, 2023, or 2024
+- **.NET Framework**: 4.8 or higher
+- **Memory**: 8GB RAM minimum, 16GB recommended
+- **Disk Space**: 500MB free space
 
-Register the plugin and restart Revit:
+### Dependencies
+This plugin works in conjunction with:
+- **[revit-mcp](https://github.com/revit-mcp/revit-mcp)**: Core MCP service provider
+- **[revit-mcp-commandset](https://github.com/revit-mcp/revit-mcp-commandset)**: Command implementations
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<RevitAddIns>
-  <AddIn Type="Application">
-    <Name>revit-mcp</Name>
-    <Assembly>%your_path%\revit-mcp-plugin.dll</Assembly>
-    <FullClassName>revit_mcp_plugin.Core.Application</FullClassName>
-    <ClientId>090A4C8C-61DC-426D-87DF-E4BAE0F80EC1</ClientId>
-    <VendorId>revit-mcp</VendorId>
-    <VendorDescription>https://github.com/revit-mcp/revit-mcp-plugin</VendorDescription>
-  </AddIn>
-</RevitAddIns>
+## 🚀 Installation
+
+### Step 1: Build the Plugin
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/neelshah-starline/revit-mcp-plugin.git
+   cd revit-mcp-plugin
+   ```
+
+2. **Build the solution**:
+   - Open `revit-mcp-plugin.sln` in Visual Studio
+   - Set build configuration to `Release`
+   - Build the solution (`Ctrl+Shift+B`)
+
+3. **Locate the compiled DLL**:
+   - Navigate to `revit-mcp-plugin\bin\Release\`
+   - Copy `revit-mcp-plugin.dll` to your desired location
+
+### Step 2: Register the Plugin
+
+1. **Create the add-in file** (`revit-mcp-plugin.addin`):
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <RevitAddIns>
+     <AddIn Type="Application">
+       <Name>revit-mcp</Name>
+       <Assembly>%your_path%\revit-mcp-plugin.dll</Assembly>
+       <FullClassName>revit_mcp_plugin.Core.Application</FullClassName>
+       <ClientId>090A4C8C-61DC-426D-87DF-E4BAE0F80EC1</ClientId>
+       <VendorId>revit-mcp</VendorId>
+       <VendorDescription>https://github.com/neelshah-starline/revit-mcp-plugin</VendorDescription>
+     </AddIn>
+   </RevitAddIns>
+   ```
+
+2. **Install the add-in**:
+   - Copy the `.addin` file to one of these locations:
+     - **Current User**: `%APPDATA%\Autodesk\Revit\Addins\2024\` (or your Revit version)
+     - **All Users**: `%ALLUSERSPROFILE%\Autodesk\Revit\Addins\2024\` (or your Revit version)
+   - Replace `%your_path%` with the actual path to your compiled DLL
+
+3. **Restart Revit** to load the plugin
+
+## ⚙️ Configuration
+
+### Initial Setup
+
+1. **Access Settings**:
+   - Launch Revit
+   - Navigate to **Add-in Modules → Revit MCP Plugin → Settings**
+
+2. **Configure Command Sets**:
+   - Click **OpenCommandSetFolder** to open the command sets directory
+   - Place your command set folders in this location
+
+### Command Set Structure
+
+A typical command set should follow this structure:
+
+```
+MyCommandSet/
+├── 2019/                          # Revit 2019 compatible DLL
+├── 2020/                          # Revit 2020 compatible DLL
+├── 2021/                          # Revit 2021 compatible DLL
+├── 2022/                          # Revit 2022 compatible DLL
+├── 2023/                          # Revit 2023 compatible DLL
+├── 2024/                          # Revit 2024 compatible DLL
+└── command.json                   # Command configuration file
 ```
 
-`%your_path%` needs to be replaced with the actual path after compilation.
+3. **Enable Commands**:
+   - Check the boxes for commands you want to load
+   - Click **Save** to apply changes
 
-### Configure Commands
+## 🎯 Usage
 
-Add-in Modules -> Revit MCP Plugin -> Settings
+### Enable MCP Service
 
-This interface is used to configure the commands to be loaded into Revit. Click OpenCommandSetFolder to open the folder storing command sets. A typical command set folder structure looks like this:
+1. **Start the Service**:
+   - Go to **Add-in → Revit MCP Plugin → Revit MCP Switch**
+   - Toggle the service **ON**
 
-```
-CommandSetName/
-├── 2019/                                # Compatible executable files for different versions
-├── 2020/
-├── 2021/
-├── 2022/
-├── 2023/
-├── 2024/
-└── command.json                         # Configuration file
-```
+2. **AI Integration**:
+   - Your AI assistant can now discover and control your Revit instance
+   - The plugin will appear as an available MCP server
 
-Successfully identified commands need to be checked to be loaded and used.
+### Important Notes
 
-### Enable Service
+- **⚠️ Configuration Changes**: If you modify command configurations after enabling the service, restart Revit for changes to take effect
+- **🔒 Service State**: The service state persists between Revit sessions
+- **📊 Real-time Updates**: Command availability updates dynamically when service is active
 
-Add-in -> Revit MCP Plugin -> Revit MCP Switch
+## 🔧 Custom Commands
 
-Open the service to allow AI to discover your Revit program. Now AI can control your Revit!
+### Development Overview
 
-> Note: If you modify the configured commands after enabling the service, you may need to restart REVIT for the configuration to take effect. This is related to whether the command has already been registered.
+Custom commands extend the plugin's functionality. Refer to the [revit-mcp-commandset](https://github.com/revit-mcp/revit-mcp-commandset) project for detailed development guidelines.
 
-## Custom Commands
+### Quick Start
 
-You can refer to the [revit-mcp-commandset](https://github.com/revit-mcp/revit-mcp-commandset) project to develop custom commands.
+1. **Create Command Class**:
+   ```csharp
+   public class MyCustomCommand : RevitCommandBase
+   {
+       public override void Execute(ExternalCommandData commandData)
+       {
+           // Your command implementation
+       }
+   }
+   ```
 
-## Project File Organization
+2. **Register Command**:
+   - Implement `IExternalCommand` interface
+   - Add command configuration to `command.json`
+   - Build for target Revit versions
+
+## 🏗️ Project Structure
 
 ```
 revit-mcp-plugin/
-├── Configuration/                            # Configuration management related classes
-│   ├── CommandConfig.cs                      # Command configuration
-│   ├── ConfigurationManager.cs               # Configuration manager
-│   ├── DeveloperInfo.cs                      # Developer information
-│   ├── FrameworkConfig.cs                    # Framework configuration
-│   └── ServiceSettings.cs                    # Service settings
+├── Configuration/                 # Configuration management
+│   ├── CommandConfig.cs          # Command configuration models
+│   ├── ConfigurationManager.cs   # Configuration loading/saving
+│   ├── DeveloperInfo.cs          # Developer information
+│   ├── FrameworkConfig.cs        # Framework settings
+│   └── ServiceSettings.cs        # Service configuration
 │
-├── Core/                                     # Program entry and core functionality
-│   ├── Application.cs                        # Application entry point
-│   ├── CommandExecutor.cs                    # Command executor
-│   ├── CommandManager.cs                     # Command manager
-│   ├── ExternalEventManager.cs               # External event manager
-│   ├── MCPServiceConnection.cs               # MCP service connection
-│   ├── RevitCommandRegistry.cs               # Revit command registration
-│   ├── Settings.cs                           # Application settings
-│   └── SocketService.cs                      # Socket service implementation
+├── Core/                         # Core functionality
+│   ├── Application.cs            # Plugin entry point
+│   ├── CommandExecutor.cs        # Command execution engine
+│   ├── CommandManager.cs         # Command lifecycle management
+│   ├── ExternalEventManager.cs   # Revit external events
+│   ├── MCPServiceConnection.cs   # MCP protocol handling
+│   ├── RevitCommandRegistry.cs   # Command registration
+│   ├── Settings.cs               # Settings interface trigger
+│   └── SocketService.cs          # Network communication
 │
-├── Models/                                   # Data models
-│   └── ...                                   # Various data model classes
+├── UI/                           # User interface components
+│   ├── SettingsWindow.xaml       # Main settings window
+│   ├── SettingsWindow.xaml.cs   # Settings window logic
+│   └── CommandSetSettingsPage.xaml # Command configuration UI
 │
-├── UI/                                       # WPF form interfaces
-│   └── ...                                   # Interface related classes
-│
-└── Utils/                                    # Utility classes
-    ├── Logger.cs                             # Logging utility
-    └── PathManager.cs                        # Path management utility
+└── Utils/                        # Utility classes
+    ├── Logger.cs                 # Logging functionality
+    └── PathManager.cs            # Path management utilities
 ```
 
-### Configuration Directory
-Responsible for managing various configuration information for the plugin:
+## 🐛 Troubleshooting
 
-- CommandConfig.cs: Defines command-related configuration
-- ConfigurationManager.cs: Manages loading, saving, and accessing configurations
-- DeveloperInfo.cs: Stores developer-related information
-- FrameworkConfig.cs: Framework-level configuration settings
-- ServiceSettings.cs: Service-related settings
+### Common Issues
 
-### Core Directory
-Contains the core functionality and entry point of the plugin:
+**❌ Plugin doesn't load**
+- Verify the `.addin` file is in the correct location
+- Check that the DLL path in the `.addin` file is correct
+- Ensure Revit version compatibility
+- Check Windows Event Viewer for error details
 
-- Application.cs: Application entry point, responsible for initializing the plugin
-- CommandExecutor.cs: Core component responsible for executing Revit commands
-- CommandManager.cs: Manages and dispatches various commands in the plugin
-- ExternalEventManager.cs: Manages Revit external events
-- MCPServiceConnection.cs: MCP service connection
-- RevitCommandRegistry.cs: Registers and manages available Revit commands
-- Settings.cs: Triggers the display of the settings interface
-- SocketService.cs: Implements Socket communication with external clients
+**❌ Commands don't appear**
+- Verify command set folder structure
+- Check `command.json` syntax
+- Ensure compatible DLLs are present for your Revit version
+- Restart Revit after configuration changes
 
-### Models Directory
-Contains data model classes used to pass data between different parts of the system.
+**❌ MCP service not discovered**
+- Confirm the service is enabled in Revit
+- Check firewall settings for network communication
+- Verify MCP client configuration
 
-### UI Directory
-Contains user interface related components of the plugin, implemented using the WPF framework.
+**❌ Command execution fails**
+- Check Revit API compatibility
+- Verify command permissions
+- Review Revit Journal files for errors
+- Enable logging for detailed error information
 
-### Utils Directory
-Provides various auxiliary tools:
+### Getting Help
 
-- Logger.cs: Logging tool for debugging and error tracking
-- PathManager.cs: Project-related file path management
+1. **Enable Logging**:
+   - Check **Enable Logging** in settings
+   - Review log files in the plugin directory
+
+2. **Check Revit Journal**:
+   - Located in `%APPDATA%\Autodesk\Revit\Journals\`
+   - Look for errors related to the plugin
+
+3. **Community Support**:
+   - [GitHub Issues](https://github.com/neelshah-starline/revit-mcp-plugin/issues)
+   - [Discussions](https://github.com/neelshah-starline/revit-mcp-plugin/discussions)
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+### Development Setup
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Make your changes**
+4. **Add tests** for new functionality
+5. **Ensure all tests pass**
+6. **Commit your changes**: `git commit -m 'Add amazing feature'`
+7. **Push to branch**: `git push origin feature/amazing-feature`
+8. **Open a Pull Request**
+
+### Contribution Guidelines
+
+- **📝 Code Style**: Follow existing code patterns and conventions
+- **🧪 Testing**: Add tests for new features
+- **📚 Documentation**: Update documentation for API changes
+- **🔄 Compatibility**: Maintain backward compatibility when possible
+- **🐛 Bug Reports**: Use GitHub Issues with detailed information
+
+### Areas for Contribution
+
+- 🔧 Bug fixes and performance improvements
+- ✨ New features and command implementations
+- 📚 Documentation and usage examples
+- 🧪 Test coverage expansion
+- 🌐 Localization support
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Built with ❤️ for the Revit and AI community**
+
+[⭐ Star this project](https://github.com/neelshah-starline/revit-mcp-plugin) |
+[🐛 Report issues](https://github.com/neelshah-starline/revit-mcp-plugin/issues) |
+[💬 Start discussion](https://github.com/neelshah-starline/revit-mcp-plugin/discussions)
+
+</div>
