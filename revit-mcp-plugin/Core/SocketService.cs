@@ -50,71 +50,116 @@ namespace revit_mcp_plugin.Core
             set => _port = value;
         }
 
-        // 初始化
-        // Initialization.
+        // Initialize the socket service
         public void Initialize(UIApplication uiApp)
         {
-            _uiApp = uiApp;
+            _logger.Info("SocketService: Starting initialization...");
 
-            // 初始化事件管理器
-            // Initialize ExternalEventManager
-            ExternalEventManager.Instance.Initialize(uiApp, _logger);
+            try
+            {
+                _uiApp = uiApp;
+                _logger.Info("SocketService: UIApplication assigned");
 
-            // 记录当前 Revit 版本
-            // Get the current Revit version.
-            var versionAdapter = new RevitMCPSDK.API.Utils.RevitVersionAdapter(_uiApp.Application);
-            string currentVersion = versionAdapter.GetRevitVersion();
-            _logger.Info("当前 Revit 版本: {0}\nCurrent Revit version: {0}", currentVersion);
+                // Initialize ExternalEventManager
+                _logger.Info("SocketService: Initializing ExternalEventManager...");
+                ExternalEventManager.Instance.Initialize(uiApp, _logger);
+                _logger.Info("SocketService: ExternalEventManager initialized");
 
+                // Get the current Revit version
+                _logger.Info("SocketService: Getting Revit version...");
+                var versionAdapter = new RevitMCPSDK.API.Utils.RevitVersionAdapter(_uiApp.Application);
+                string currentVersion = versionAdapter.GetRevitVersion();
+                _logger.Info($"Current Revit version: {currentVersion}");
 
+                // Create CommandExecutor
+                _logger.Info("SocketService: Creating CommandExecutor...");
+                _commandExecutor = new CommandExecutor(_commandRegistry, _logger);
+                _logger.Info("SocketService: CommandExecutor created");
 
-            // 创建命令执行器
-            // Create CommandExecutor
-            _commandExecutor = new CommandExecutor(_commandRegistry, _logger);
+                // Load configuration and register commands
+                _logger.Info("SocketService: Loading configuration...");
+                ConfigurationManager configManager = new ConfigurationManager(_logger);
+                configManager.LoadConfiguration();
+                _logger.Info("SocketService: Configuration loaded");
 
-            // 加载配置并注册命令
-            // Load configuration and register commands.
-            ConfigurationManager configManager = new ConfigurationManager(_logger);
-            configManager.LoadConfiguration();
-            
+                //// Read the service port from the configuration
+                //if (configManager.Config.Settings.Port > 0)
+                //{
+                //    _port = configManager.Config.Settings.Port;
+                //}
+                _port = 8080; // Hard-coded port number
+                _logger.Info($"SocketService: Using port {_port}");
 
-            //// 从配置中读取服务端口
-            //// Read the service port from the configuration.
-            //if (configManager.Config.Settings.Port > 0)
-            //{
-            //    _port = configManager.Config.Settings.Port;
-            //}
-            _port = 8080; // 固定端口号 - Hard-wired port number.
+                // Load commands
+                _logger.Info("SocketService: Loading commands...");
+                CommandManager commandManager = new CommandManager(
+                    _commandRegistry, _logger, configManager, _uiApp);
+                commandManager.LoadCommands();
+                _logger.Info("SocketService: Commands loaded");
 
-            // 加载命令
-            // Load command.
-            CommandManager commandManager = new CommandManager(
-                _commandRegistry, _logger, configManager, _uiApp);
-            commandManager.LoadCommands();
-
-            _logger.Info($"Socket service initialized on port {_port}");
+                _logger.Info($"Socket service initialized successfully on port {_port}");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"SocketService initialization failed: {ex.Message}");
+                _logger.Error($"Stack trace: {ex.StackTrace}");
+                throw; // Re-throw to let caller handle it
+            }
         }
 
         public void Start()
         {
-            if (_isRunning) return;
-
-            try
+            if (_isRunning)
             {
-                _isRunning = true;
-                _listener = new TcpListener(IPAddress.Any, _port);
-                _listener.Start();
+                _logger.Info("SocketService: Service is already running");
+                return;
+            }
 
-                _listenerThread = new Thread(ListenForClients)
+            // Try to start on the configured port, with fallback ports if needed
+            int[] portsToTry = { _port, 8081, 8082, 8083, 8084, 8085 };
+
+            foreach (int portToTry in portsToTry)
+            {
+                try
                 {
-                    IsBackground = true
-                };
-                _listenerThread.Start();              
+                    _logger.Info($"SocketService: Attempting to start TCP listener on port {portToTry}...");
+
+                    _isRunning = true;
+                    _listener = new TcpListener(IPAddress.Any, portToTry);
+                    _listener.Start();
+
+                    _port = portToTry; // Update the actual port being used
+                    _logger.Info($"SocketService: TCP listener started successfully on port {_port}");
+
+                    _listenerThread = new Thread(ListenForClients)
+                    {
+                        IsBackground = true,
+                        Name = "RevitMCP-SocketListener"
+                    };
+                    _listenerThread.Start();
+
+                    _logger.Info("SocketService: Listener thread started");
+                    return; // Success, exit the loop
+                }
+                catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                {
+                    _logger.Warning($"SocketService: Port {portToTry} is already in use, trying next port...");
+                    _isRunning = false;
+                    continue; // Try next port
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"SocketService: Failed to start socket service on port {portToTry}: {ex.Message}");
+                    _logger.Error($"Stack trace: {ex.StackTrace}");
+                    _isRunning = false;
+                    throw; // Re-throw for critical errors (not port conflicts)
+                }
             }
-            catch (Exception)
-            {
-                _isRunning = false;
-            }
+
+            // If we get here, all ports failed
+            _logger.Error("SocketService: Failed to start on any available port (8080-8085)");
+            _isRunning = false;
+            throw new Exception("Could not start socket service - all ports (8080-8085) are in use");
         }
 
         public void Stop()
@@ -175,8 +220,7 @@ namespace revit_mcp_plugin.Core
 
                 while (_isRunning && tcpClient.Connected)
                 {
-                    // 读取客户端消息
-                    // Read client messages.
+                    // Read client messages
                     int bytesRead = 0;
 
                     try
@@ -185,25 +229,22 @@ namespace revit_mcp_plugin.Core
                     }
                     catch (IOException)
                     {
-                        // 客户端断开连接
-                        // Client disconnected.
+                        // Client disconnected
                         break;
                     }
 
                     if (bytesRead == 0)
                     {
-                        // 客户端断开连接
-                        // Client disconnected.
+                        // Client disconnected
                         break;
                     }
 
                     string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    System.Diagnostics.Trace.WriteLine($"收到消息: {message}\nReceived message: {message}");
+                    System.Diagnostics.Trace.WriteLine($"Received message: {message}");
 
                     string response = ProcessJsonRPCRequest(message);
 
-                    // 发送响应
-                    // Send response.
+                    // Send response
                     byte[] responseData = Encoding.UTF8.GetBytes(response);
                     stream.Write(responseData, 0, responseData.Length);
                 }
@@ -224,12 +265,10 @@ namespace revit_mcp_plugin.Core
 
             try
             {
-                // 解析JSON-RPC请求
-                // Parse JSON-RPC requests.
+                // Parse JSON-RPC requests
                 request = JsonConvert.DeserializeObject<JsonRPCRequest>(requestJson);
 
-                // 验证请求格式是否有效
-                // Verify that the request format is valid.
+                // Verify that the request format is valid
                 if (request == null || !request.IsValid())
                 {
                     return CreateErrorResponse(
@@ -239,18 +278,16 @@ namespace revit_mcp_plugin.Core
                     );
                 }
 
-                // 查找命令
-                // Search for the command in the registry.
+                // Search for the command in the registry
                 if (!_commandRegistry.TryGetCommand(request.Method, out var command))
                 {
                     return CreateErrorResponse(request.Id, JsonRPCErrorCodes.MethodNotFound,
                         $"Method '{request.Method}' not found");
                 }
 
-                // 执行命令
-                // Execute command.
+                // Execute command
                 try
-                {                
+                {
                     object result = command.Execute(request.GetParamsObject(), request.Id);
 
                     return CreateSuccessResponse(request.Id, result);
@@ -262,8 +299,7 @@ namespace revit_mcp_plugin.Core
             }
             catch (JsonException)
             {
-                // JSON解析错误
-                // JSON parsing error.
+                // JSON parsing error
                 return CreateErrorResponse(
                     null,
                     JsonRPCErrorCodes.ParseError,
@@ -272,8 +308,7 @@ namespace revit_mcp_plugin.Core
             }
             catch (Exception ex)
             {
-                // 处理请求时的其他错误
-                // Catch other errors produced when processing requests.
+                // Catch other errors produced when processing requests
                 return CreateErrorResponse(
                     null,
                     JsonRPCErrorCodes.InternalError,
