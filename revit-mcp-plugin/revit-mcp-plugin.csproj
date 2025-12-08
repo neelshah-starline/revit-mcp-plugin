@@ -76,15 +76,22 @@
             <RootItem Include="$(ProjectDir)*.addin"/>
             <AddinItem Include="$(TargetDir)*.dll"/>
             <AddinItem Include="$(TargetDir)*.pdb"/>
+            <!-- Include SampleCommandSet folder and all its contents -->
+            <SampleCommandSet Include="$(ProjectDir)SampleCommandSet\**\*.*"/>
         </ItemGroup>
 
         <PropertyGroup>
             <RootDir>bin\AddIn $(RevitVersion) $(Configuration)\</RootDir>
             <AddinDir>$(RootDir)$(RootNameSpace)\</AddinDir>
+            <CommandsDir>$(AddinDir)Commands\</CommandsDir>
         </PropertyGroup>
 
         <Copy SourceFiles="@(RootItem)" DestinationFolder="$(RootDir)"/>
         <Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AddinDir)"/>
+
+        <!-- Create Commands directory and copy SampleCommandSet -->
+        <MakeDir Directories="$(CommandsDir)"/>
+        <Copy SourceFiles="@(SampleCommandSet)" DestinationFolder="$(CommandsDir)%(RecursiveDir)"/>
 
         <ItemGroup>
             <AddinFiles Include="$(RootDir)**\*.*"/>

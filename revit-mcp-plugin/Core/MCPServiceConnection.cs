@@ -5,29 +5,35 @@ using System;
 
 namespace revit_mcp_plugin.Core
 {
+    /// <summary>
+    /// Command availability class that allows MCP control even without open documents
+    /// </summary>
+    public class MCPCommandAvailability : IExternalCommandAvailability
+    {
+        public bool IsCommandAvailable(UIApplication applicationData, CategorySet selectedCategories)
+        {
+            // Always available - doesn't require document or selection
+            return true;
+        }
+    }
+
     [Transaction(TransactionMode.Manual)]
     public class MCPServiceConnection : IExternalCommand
     {
+        // Make command always available, even without open documents
+        public string AvailabilityClassName => "revit_mcp_plugin.Core.MCPCommandAvailability";
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             try
             {
-                // 获取socket服务
-                // Obtain socket service.
-                SocketService service = SocketService.Instance;
-
-                if (service.IsRunning)
-                {
-                    service.Stop();
-                    TaskDialog.Show("revitMCP", "Close Server");
-                }
+                // Simple toggle: start if stopped, stop if running
+                if (SocketService.Instance.IsRunning)
+                    SocketService.Instance.Stop();
                 else
-                {
-                    service.Initialize(commandData.Application);
-                    service.Start();
-                    TaskDialog.Show("revitMCP", "Open Server");
-                }
+                    SocketService.Instance.Start();
 
+                // UI updates automatically via RunningStateChanged event
                 return Result.Succeeded;
             }
             catch (Exception ex)

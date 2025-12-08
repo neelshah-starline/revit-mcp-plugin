@@ -1,0 +1,202 @@
+{
+  "commands": [
+    {
+      "commandName": "ai_element_filter",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Filters Revit elements using AI-powered criteria"
+    },
+    {
+      "commandName": "color_splash",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Applies color coding to elements based on specified parameters"
+    },
+    {
+      "commandName": "create_line_based_element",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Creates line-based elements like walls and beams"
+    },
+    {
+      "commandName": "create_point_based_element",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Creates point-based elements like doors and furniture"
+    },
+    {
+      "commandName": "create_surface_based_element",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Creates surface-based elements like floors and ceilings"
+    },
+    {
+      "commandName": "operate_element",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Performs operations on selected elements (select, hide, isolate, etc.)"
+    },
+    {
+      "commandName": "tag_all_walls",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Creates tags for all walls in the current view"
+    },
+    {
+      "commandName": "get_available_family_types",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Retrieves all available family types in the project"
+    },
+    {
+      "commandName": "get_current_view_elements",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Gets all elements visible in the current view"
+    },
+    {
+      "commandName": "get_current_view_info",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Retrieves information about the current active view"
+    },
+    {
+      "commandName": "get_selected_elements",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Gets information about currently selected elements"
+    },
+    {
+      "commandName": "create_dimensions",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Creates dimension annotations in the model"
+    },
+    {
+      "commandName": "delete_element",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Deletes elements using ElementId"
+    },
+    {
+      "commandName": "send_code_to_revit",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Executes dynamic C# code within the Revit environment"
+    },
+    {
+      "commandName": "get_current_document_info",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Retrieves comprehensive metadata about the currently active Revit document"
+    },
+    {
+      "commandName": "get_element_parameters",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Retrieves all parameters and their current values for a specific Revit element"
+    },
+    {
+      "commandName": "set_element_parameters",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Modifies parameter values for a specific Revit element"
+    },
+    {
+      "commandName": "get_revit_application_info",
+      "assemblyPath": "RevitMCPCommandSet.dll",
+      "enabled": true,
+      "supportedRevitVersions": [],
+      "developer": {
+        "name": "Revit MCP Team",
+        "email": "support@revitmcp.com"
+      },
+      "description": "Returns session-level Revit application metadata without requiring an open document"
+    }
+  ]
+}
