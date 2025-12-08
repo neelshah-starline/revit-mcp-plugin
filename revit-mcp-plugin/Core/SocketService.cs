@@ -44,6 +44,8 @@ namespace revit_mcp_plugin.Core
 
         public bool IsRunning => _isRunning;
 
+        public event EventHandler<bool> RunningStateChanged;
+
         public int Port
         {
             get => _port;
@@ -139,6 +141,10 @@ namespace revit_mcp_plugin.Core
                     _listenerThread.Start();
 
                     _logger.Info("SocketService: Listener thread started");
+
+                    // Raise event for state change
+                    RunningStateChanged?.Invoke(this, _isRunning);
+
                     return; // Success, exit the loop
                 }
                 catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
@@ -177,6 +183,9 @@ namespace revit_mcp_plugin.Core
                 {
                     _listenerThread.Join(1000);
                 }
+
+                // Raise event for state change
+                RunningStateChanged?.Invoke(this, _isRunning);
             }
             catch (Exception)
             {

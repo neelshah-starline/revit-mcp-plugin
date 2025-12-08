@@ -27,22 +27,13 @@ namespace revit_mcp_plugin.Core
         {
             try
             {
-                // 获取socket服务
-                // Obtain socket service.
-                SocketService service = SocketService.Instance;
-
-                if (service.IsRunning)
-                {
-                    service.Stop();
-                    TaskDialog.Show("revitMCP", "Close Server");
-                }
+                // Simple toggle: start if stopped, stop if running
+                if (SocketService.Instance.IsRunning)
+                    SocketService.Instance.Stop();
                 else
-                {
-                    service.Initialize(commandData.Application);
-                    service.Start();
-                    TaskDialog.Show("revitMCP", "Open Server");
-                }
+                    SocketService.Instance.Start();
 
+                // UI updates automatically via RunningStateChanged event
                 return Result.Succeeded;
             }
             catch (Exception ex)
